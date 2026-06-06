@@ -1,0 +1,15 @@
+services:
+  - type: worker
+    name: bepaper-scheduler
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: PEXELS_API_KEY
+        sync: false
+      - key: ARTICLES_API_SECRET
+        sync: false
+      - key: WEBSITE_URL
+        sync: false

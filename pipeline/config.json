@@ -1,0 +1,123 @@
+{
+  "schedule": {
+    "time": "07:26",
+    "timezone": "Europe/Brussels"
+  },
+  "pipeline": {
+    "articlesPerDay": 3,
+    "minArticlesRequired": 3,
+    "topicRepetitionWeight": 4
+  },
+  "posting": {
+    "mode": "same-time",
+    "firstPostTime": "09:00",
+    "intervalMinutes": 130,
+    "randomMin": 60,
+    "randomMax": 180,
+    "specificTimes": [
+      "09:00",
+      "11:10",
+      "13:00"
+    ]
+  },
+  "rssFeeds": [
+    {
+      "name": "BFM",
+      "url": "https://www.bfmtv.com/rss/economie/",
+      "enabled": true
+    },
+    {
+      "name": "BFM",
+      "url": "https://www.bfmtv.com/rss/crypto/",
+      "enabled": true
+    },
+    {
+      "name": "BFM",
+      "url": "https://www.bfmtv.com/rss/economie/patrimoine/",
+      "enabled": true
+    },
+    {
+      "name": "BFM",
+      "url": "https://www.bfmtv.com/rss/economie/economie-social/",
+      "enabled": true
+    },
+    {
+      "name": "BFM",
+      "url": "https://www.bfmtv.com/rss/economie/economie-social/finances-publiques/",
+      "enabled": true
+    },
+    {
+      "name": "BFM",
+      "url": "https://www.bfmtv.com/rss/economie/international/",
+      "enabled": true
+    },
+    {
+      "name": "BFM",
+      "url": "https://www.bfmtv.com/rss/economie/entreprises/",
+      "enabled": true
+    },
+    {
+      "name": "BFM",
+      "url": "https://www.bfmtv.com/rss/economie/emploi/",
+      "enabled": true
+    },
+    {
+      "name": "BFM",
+      "url": "https://www.bfmtv.com/rss/economie/patrimoine/impots-fiscalite/",
+      "enabled": true
+    },
+    {
+      "name": "La Tribune",
+      "url": "https://www.latribune.fr/rss/homepage",
+      "enabled": true
+    },
+    {
+      "name": "FrenchWeb",
+      "url": "https://www.frenchweb.fr/feed",
+      "enabled": true
+    }
+  ],
+  "images": {
+    "enabled": true,
+    "relevanceThreshold": 7,
+    "generationStyle": "Photojournalistic style, natural lighting, documentary aesthetic, high quality press photo",
+    "strategy": "priority",
+    "sources": [
+      {
+        "name": "pexels",
+        "enabled": true,
+        "weight": 25
+      },
+      {
+        "name": "unsplash",
+        "enabled": true,
+        "weight": 25
+      },
+      {
+        "name": "pixabay",
+        "enabled": true,
+        "weight": 25
+      },
+      {
+        "name": "openverse",
+        "enabled": true,
+        "weight": 25
+      }
+    ]
+  },
+  "articleStructure": {
+    "mode": "auto",
+    "allowlist": [
+      "pyramide-inversee",
+      "flash",
+      "narratif",
+      "analyse",
+      "qr",
+      "listicle",
+      "chronologie",
+      "contexte-dabord",
+      "mise-en-perspective",
+      "briefing"
+    ]
+  }
+}

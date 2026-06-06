@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BEpaper Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f5f0;
+      --surface: #ffffff;
+      --border: #e2e2dc;
+      --text: #1a1a18;
+      --muted: #6b6b66;
+      --accent: #1d4ed8;
+      --accent-hover: #1e40af;
+      --green: #16a34a;
+      --red: #dc2626;
+      --yellow: #ca8a04;
+      --radius: 8px;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 14px; background: var(--bg); color: var(--text); line-height: 1.5; }
+
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    header h1 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+    header h1 span { color: var(--muted); font-weight: 400; }
+
+    main { max-width: 1200px; margin: 0 auto; padding: 28px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+    .row { display: grid; gap: 20px; }
+    .row-2 { grid-template-columns: 1fr 1fr; }
+    .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+    .card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
+
+    /* Next batch banner */
+    .banner { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+    .banner-left { display: flex; align-items: center; gap: 20px; }
+    .banner-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px #dcfce7; flex-shrink: 0; }
+    .banner-label { font-size: 12px; color: var(--muted); }
+    .banner-time { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+    .banner-countdown { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .divider-v { width: 1px; height: 40px; background: var(--border); }
+    .scrape-info { font-size: 13px; }
+    .scrape-info strong { font-weight: 600; }
+    .scrape-time { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .banner-actions { display: flex; gap: 10px; flex-shrink: 0; }
+
+    /* Fields */
+    .field { margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; }
+    label .hint { font-weight: 400; color: var(--muted); margin-left: 5px; }
+    input[type="number"], input[type="text"], select {
+      width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px;
+      font-size: 13px; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s;
+    }
+    input:focus, select:focus { border-color: var(--accent); background: #fff; }
+    .fields-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: background 0.15s, opacity 0.15s; white-space: nowrap; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--bg); }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    .btn-push { background: #f0fdf4; color: var(--green); border: 1px solid #bbf7d0; padding: 3px 9px; font-size: 11px; border-radius: 4px; cursor: pointer; font-weight: 500; transition: background 0.15s; white-space: nowrap; }
+    .btn-push:hover { background: #dcfce7; }
+    .btn-push:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-generate { background: #eff6ff; color: var(--accent); border: 1px solid #bfdbfe; padding: 3px 9px; font-size: 11px; border-radius: 4px; cursor: pointer; font-weight: 500; transition: background 0.15s; white-space: nowrap; }
+    .btn-generate:hover { background: #dbeafe; }
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Ready articles panel */
+    .ready-actions { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .ready-article-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .ready-article-item:last-child { border-bottom: none; }
+    .ready-title { flex: 1; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .ready-time { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+
+    .save-row { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+
+    /* Stats */
+    .stats-row { display: flex; gap: 16px; margin-bottom: 16px; }
+    .stat { text-align: center; }
+    .stat-value { font-size: 22px; font-weight: 700; line-height: 1; }
+    .stat-label { font-size: 10px; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.yellow { color: var(--yellow); }
+    .stat-value.red { color: var(--red); }
+    .divider-h { width: 1px; background: var(--border); }
+
+    /* Article list */
+    .article-list { list-style: none; }
+    .article-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .article-item:last-child { border-bottom: none; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .dot-green { background: var(--green); }
+    .dot-yellow { background: var(--yellow); }
+    .dot-red { background: var(--red); }
+    .article-title { flex: 1; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .article-cat { font-size: 11px; color: var(--muted); flex-shrink: 0; width: 70px; }
+    input[type="time"] { width: 82px; padding: 3px 6px; font-size: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text); outline: none; flex-shrink: 0; }
+    input[type="time"]:focus { border-color: var(--accent); background: #fff; }
+    input[type="time"]:disabled { opacity: 0.45; cursor: not-allowed; }
+    .badge { font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 600; flex-shrink: 0; }
+    .badge-green { background: #dcfce7; color: var(--green); }
+    .badge-yellow { background: #fef9c3; color: var(--yellow); }
+    .badge-red { background: #fee2e2; color: var(--red); }
+
+    /* Sourced articles */
+    .source-list { list-style: none; max-height: 340px; overflow-y: auto; }
+    .source-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .source-item:last-child { border-bottom: none; }
+    .source-thumb { width: 48px; height: 34px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background: var(--bg); }
+    .source-thumb-placeholder { width: 48px; height: 34px; border-radius: 4px; flex-shrink: 0; background: var(--border); }
+    .source-body { flex: 1; min-width: 0; }
+    .source-headline { font-size: 12px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .source-headline a { color: var(--text); text-decoration: none; }
+    .source-headline a:hover { text-decoration: underline; }
+    .source-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .history-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .history-table th { text-align: left; font-weight: 600; color: var(--muted); padding: 4px 12px 6px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+    .history-table td { padding: 7px 12px 7px 0; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .history-table tr:last-child td { border-bottom: none; }
+    .badge-manual { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 600; }
+    .badge-auto   { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 600; }
+
+    /* Logs */
+    .log-box { background: #111; color: #a3e635; font-family: "SF Mono", "Fira Code", monospace; font-size: 11.5px; line-height: 1.6; padding: 14px; border-radius: 6px; overflow-y: auto; max-height: 320px; white-space: pre-wrap; word-break: break-all; }
+    .log-error { color: #f87171; }
+    .log-ok { color: #86efac; }
+
+    .empty { color: var(--muted); font-size: 13px; padding: 10px 0; }
+    .inline-status { font-size: 12px; color: var(--muted); }
+    .inline-status.ok { color: var(--green); }
+    .inline-status.err { color: var(--red); }
+
+    /* Mode tabs */
+    .mode-tabs { display: flex; gap: 4px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
+    .mode-tab { flex: 1; padding: 5px 8px; border: none; border-radius: 4px; background: transparent; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--muted); transition: background 0.15s, color 0.15s; white-space: nowrap; }
+    .mode-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .mode-fields { margin-top: 10px; }
+    .section-divider { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 16px 0 10px; padding-top: 14px; border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>BEpaper <span>/ Admin</span></h1>
+</header>
+
+<main>
+
+  <!-- BANNER + CONFIG side by side -->
+  <div class="row row-2">
+
+    <!-- BANNER: next batch + scrape info -->
+    <div class="card">
+      <div class="banner">
+        <div class="banner-left">
+          <span class="banner-dot"></span>
+          <div>
+            <div class="banner-label">Next pipeline run</div>
+            <div class="banner-time" id="next-run-time">—</div>
+            <div class="banner-countdown" id="next-run-countdown">Loading…</div>
+          </div>
+          <div class="divider-v"></div>
+          <div>
+            <div class="banner-label">Last scrape</div>
+            <div class="scrape-info" id="scrape-summary">Loading…</div>
+            <div class="scrape-time" id="scrape-time"></div>
+          </div>
+        </div>
+        <div class="banner-actions">
+          <button class="btn btn-ghost" onclick="runPipeline(this)">▶ Run pipeline</button>
+        </div>
+      </div>
+
+      <div id="scrape-history-wrap" style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:10px">Scrape history</div>
+        <div id="scrape-history-content"><span class="empty">Loading…</span></div>
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="card">
+      <div class="card-title">Configuration</div>
+
+      <!-- Timezone — single, applies everywhere -->
+      <div class="field">
+        <label>Timezone <span class="hint">applies to all times below</span></label>
+        <select id="scheduleTimezone">
+          <option value="Europe/Brussels">Europe/Brussels</option>
+          <option value="Europe/Paris">Europe/Paris</option>
+          <option value="Europe/London">Europe/London</option>
+          <option value="UTC">UTC</option>
+          <option value="America/New_York">America/New_York</option>
+        </select>
+      </div>
+
+      <div class="section-divider">Pipeline schedule</div>
+      <div class="fields-2">
+        <div class="field">
+          <label>Trigger time HH:MM</label>
+          <input type="time" id="scheduleTime" />
+        </div>
+        <div class="field">
+          <label>Articles / day</label>
+          <input type="number" id="articlesPerDay" min="1" max="20" oninput="onArticlesPerDayChange()" />
+        </div>
+      </div>
+      <div class="fields-2">
+        <div class="field">
+          <label>Min required</label>
+          <input type="number" id="minArticlesRequired" min="1" max="20" />
+        </div>
+      </div>
+
+      <div class="section-divider">Posting schedule</div>
+
+      <div class="field">
+        <label>Mode</label>
+        <div class="mode-tabs">
+          <button class="mode-tab" data-mode="interval"  onclick="setPostingMode('interval')">Interval</button>
+          <button class="mode-tab" data-mode="same-time" onclick="setPostingMode('same-time')">Same time</button>
+          <button class="mode-tab" data-mode="random"    onclick="setPostingMode('random')">Random</button>
+          <button class="mode-tab" data-mode="specific"  onclick="setPostingMode('specific')">Specific</button>
+        </div>
+      </div>
+
+      <!-- interval -->
+      <div id="mode-interval" class="mode-fields" style="display:none">
+        <div class="fields-2">
+          <div class="field"><label>First post HH:MM</label><input type="time" id="firstPostTime" /></div>
+          <div class="field"><label>Interval <span class="hint">minutes</span></label><input type="number" id="intervalMinutes" min="1" max="1440" /></div>
+        </div>
+      </div>
+
+      <!-- same-time -->
+      <div id="mode-same-time" class="mode-fields" style="display:none">
+        <div class="field" style="max-width:180px"><label>Post time HH:MM</label><input type="time" id="samePostTime" /></div>
+      </div>
+
+      <!-- random -->
+      <div id="mode-random" class="mode-fields" style="display:none">
+        <div class="fields-2">
+          <div class="field"><label>First post HH:MM</label><input type="time" id="randomFirstPostTime" /></div>
+        </div>
+        <div class="fields-2">
+          <div class="field"><label>Min interval <span class="hint">min</span></label><input type="number" id="randomMin" min="1" /></div>
+          <div class="field"><label>Max interval <span class="hint">min</span></label><input type="number" id="randomMax" min="1" /></div>
+        </div>
+      </div>
+
+      <!-- specific -->
+      <div id="mode-specific" class="mode-fields" style="display:none">
+        <div id="specific-times-list"></div>
+      </div>
+
+      <div class="save-row">
+        <button class="btn btn-primary" onclick="saveConfig()">Save config</button>
+        <span id="save-status" class="inline-status"></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SOURCED ARTICLES (full width) -->
+  <div class="card">
+    <div class="card-title">
+      Sourced articles
+      <button class="btn btn-ghost btn-sm" onclick="scrapeNow(this)">⟳ Scrape now</button>
+    </div>
+    <div id="scraped-content"><span class="empty">Loading…</span></div>
+  </div>
+
+  <!-- ARTICLE SELECTION -->
+  <div class="card">
+    <div class="card-title">
+      Article selection
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="selection-status" class="inline-status"></span>
+        <button id="btn-add-more" class="btn btn-ghost btn-sm" onclick="runSelection(this,'add-more')">+ Add more</button>
+        <button class="btn btn-ghost btn-sm" onclick="runSelection(this,'refresh')">↺ Refresh selection</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:#fecaca" onclick="clearSelection(this)">✕ Clear</button>
+      </div>
+    </div>
+    <div id="selected-content"><span class="empty">Loading…</span></div>
+    <div id="generate-all-wrap" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:none;justify-content:flex-end;align-items:center;gap:12px">
+      <span id="generate-all-status" class="inline-status"></span>
+      <button id="btn-generate-all" class="btn btn-primary" onclick="generateAll(this)">✦ Generate all articles</button>
+    </div>
+  </div>
+
+  <!-- ARTICLES READY TO BE POSTED -->
+  <div class="card" id="ready-card">
+    <div class="card-title">
+      Articles ready to be posted
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="loadReady()">Refresh</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:#fecaca" onclick="clearReady(this)">✕ Clear</button>
+      </div>
+    </div>
+    <div id="ready-content"><span class="empty">Loading…</span></div>
+  </div>
+
+  <!-- TODAY'S ARTICLES -->
+  <div class="card">
+    <div class="card-title">
+      Today's articles
+      <div style="display:flex;gap:8px">
+        <span id="schedule-status" class="inline-status"></span>
+        <button class="btn btn-ghost btn-sm" onclick="saveSchedule()">Save times</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadStatus()">Refresh</button>
+      </div>
+    </div>
+    <div id="status-content"><span class="empty">Loading…</span></div>
+  </div>
+
+  <!-- LOGS -->
+  <div class="card">
+    <div class="card-title">
+      Scheduler logs — today
+      <button class="btn btn-ghost btn-sm" onclick="loadLogs()">Refresh</button>
+    </div>
+    <div class="log-box" id="log-box">Loading…</div>
+  </div>
+
+</main>
+
+<!-- ARTICLE PREVIEW MODAL -->
+<div id="preview-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto" onclick="if(event.target===this)closeModal()">
+  <div style="background:#fff;max-width:700px;width:100%;border-radius:10px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.25);margin:auto">
+    <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+      <span id="modal-category" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted)"></span>
+      <span id="modal-title" style="flex:1;font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕ Close</button>
+    </div>
+    <img id="modal-image" style="width:100%;height:220px;object-fit:cover;display:none" />
+    <div style="padding:20px">
+      <p id="modal-credit" style="font-size:11px;color:var(--muted);margin-bottom:14px;display:none"></p>
+      <p id="modal-chapo" style="font-size:14px;font-style:italic;color:#374151;line-height:1.6;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)"></p>
+      <div id="modal-body" style="font-size:13px;line-height:1.75;color:var(--text)"></div>
+      <div id="modal-source-wrap" style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border);display:none">
+        <a id="modal-source" href="#" target="_blank" style="font-size:12px;color:var(--accent)">→ View source article</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function formatCountdown(isoString) {
+    const diff = new Date(isoString) - Date.now();
+    if (diff <= 0) return 'now';
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    return h > 0 ? `in ${h}h ${m}m` : `in ${m}m`;
+  }
+
+  function formatBrussels(isoString, opts = {}) {
+    return new Date(isoString).toLocaleString('fr-BE', { timeZone: 'Europe/Brussels', ...opts });
+  }
+
+  function toBrusselsDatetime(isoString) {
+    // Returns { date: "YYYY-MM-DD", time: "HH:MM" } in Brussels timezone
+    const s = new Date(isoString).toLocaleString('en-CA', {
+      timeZone: 'Europe/Brussels', year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    const [date, time] = s.replace(', ', 'T').split('T');
+    return { date, time: time.slice(0, 5) };
+  }
+
+  // ── Next run ─────────────────────────────────────────────────────────────────
+
+  let nextRunIso = null;
+
+  async function loadNextRun() {
+    const { next_run } = await fetch('/api/next-run').then(r => r.json());
+    nextRunIso = next_run;
+    const t = formatBrussels(next_run, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    document.getElementById('next-run-time').textContent = t;
+    document.getElementById('next-run-countdown').textContent = formatCountdown(next_run);
+  }
+
+  // ── Config ───────────────────────────────────────────────────────────────────
+
+  function setPostingMode(mode) {
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+    document.querySelectorAll('.mode-fields').forEach(f => f.style.display = 'none');
+    document.getElementById('mode-' + mode).style.display = 'block';
+    if (mode === 'specific') buildSpecificTimes();
+  }
+
+  function buildSpecificTimes(existingValues) {
+    const count = parseInt(document.getElementById('articlesPerDay').value) || 4;
+    const container = document.getElementById('specific-times-list');
+    const prev = existingValues || Array.from(container.querySelectorAll('input[type="time"]')).map(i => i.value);
+    container.innerHTML = Array.from({ length: count }, (_, i) => `
+      <div class="field" style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <label style="min-width:72px;margin:0;font-size:12px">Article ${i + 1}</label>
+        <input type="time" id="specificTime${i}" value="${prev[i] || '09:00'}" style="width:auto" />
+      </div>`).join('');
+  }
+
+  function onArticlesPerDayChange() {
+    const activeMode = document.querySelector('.mode-tab.active');
+    if (activeMode && activeMode.dataset.mode === 'specific') buildSpecificTimes();
+  }
+
+  async function loadConfig() {
+    const cfg = await fetch('/api/config').then(r => r.json());
+    document.getElementById('scheduleTimezone').value = cfg.schedule.timezone || 'Europe/Brussels';
+    document.getElementById('scheduleTime').value = cfg.schedule.time || '06:00';
+    document.getElementById('articlesPerDay').value = cfg.pipeline.articlesPerDay;
+    document.getElementById('minArticlesRequired').value = cfg.pipeline.minArticlesRequired;
+
+    const p = cfg.posting;
+    document.getElementById('firstPostTime').value = p.firstPostTime || '09:00';
+    document.getElementById('intervalMinutes').value = p.intervalMinutes || 130;
+    document.getElementById('samePostTime').value = p.firstPostTime || '09:00';
+    document.getElementById('randomFirstPostTime').value = p.firstPostTime || '09:00';
+    document.getElementById('randomMin').value = p.randomMin || 60;
+    document.getElementById('randomMax').value = p.randomMax || 180;
+
+    setPostingMode(p.mode || 'interval');
+
+    // Populate specific times after mode panels are visible
+    if (p.specificTimes && p.specificTimes.length) {
+      buildSpecificTimes(p.specificTimes);
+    }
+  }
+
+  async function saveConfig() {
+    const activeMode = (document.querySelector('.mode-tab.active') || {}).dataset?.mode || 'interval';
+    const articlesPerDay = +document.getElementById('articlesPerDay').value;
+
+    // First post time depends on mode
+    let firstPostTime = document.getElementById('firstPostTime').value;
+    if (activeMode === 'same-time') firstPostTime = document.getElementById('samePostTime').value;
+    if (activeMode === 'random')    firstPostTime = document.getElementById('randomFirstPostTime').value;
+
+    const specificTimes = Array.from({ length: articlesPerDay }, (_, i) => {
+      const el = document.getElementById('specificTime' + i);
+      return el ? el.value : '09:00';
+    });
+
+    const config = {
+      schedule: {
+        time: document.getElementById('scheduleTime').value,
+        timezone: document.getElementById('scheduleTimezone').value,
+      },
+      pipeline: {
+        articlesPerDay,
+        minArticlesRequired: +document.getElementById('minArticlesRequired').value,
+      },
+      posting: {
+        mode: activeMode,
+        firstPostTime,
+        intervalMinutes: +document.getElementById('intervalMinutes').value,
+        randomMin: +document.getElementById('randomMin').value,
+        randomMax: +document.getElementById('randomMax').value,
+        specificTimes,
+      },
+    };
+    const el = document.getElementById('save-status');
+    try {
+      await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config) });
+      el.className = 'inline-status ok'; el.textContent = '✓ Saved';
+      await loadNextRun();
+      setTimeout(() => { el.textContent = ''; }, 3000);
+    } catch { el.className = 'inline-status err'; el.textContent = 'Error'; }
+  }
+
+  // ── Scraped articles ─────────────────────────────────────────────────────────
+
+  async function loadScrapeHistory() {
+    const history = await fetch('/api/scrape-history').then(r => r.json());
+    const el = document.getElementById('scrape-history-content');
+    if (!history.length) { el.innerHTML = '<span class="empty">No scrape history yet.</span>'; return; }
+    el.innerHTML = `<table class="history-table">
+      <thead><tr><th>Date &amp; time</th><th>Articles</th><th>Triggered by</th></tr></thead>
+      <tbody>
+        ${history.map((h, i) => {
+          const t = formatBrussels(h.scraped_at, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+          const badge = h.source === 'manual'
+            ? '<span class="badge-manual">manual</span>'
+            : '<span class="badge-auto">pipeline</span>';
+          return `<tr>
+            <td>${t}${i === 0 ? ' <span style="color:var(--muted);font-size:11px">(latest)</span>' : ''}</td>
+            <td>${h.total}</td>
+            <td>${badge}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+  }
+
+  async function loadScraped() {
+    const s = await fetch('/api/scraped').then(r => r.json());
+
+    const el = document.getElementById('scraped-content');
+    const timeEl = document.getElementById('scrape-time');
+    const summaryEl = document.getElementById('scrape-summary');
+
+    if (!s.exists) {
+      el.innerHTML = '<p class="empty">No scraped_articles.json found.</p>';
+      summaryEl.innerHTML = '<strong>No data</strong>';
+      return;
+    }
+
+    const t = formatBrussels(s.scraped_at, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    summaryEl.innerHTML = `<strong>${s.total} articles</strong> scraped`;
+    timeEl.textContent = `Last scraped ${t} Brussels`;
+
+    // Build set of already-selected URLs for button state
+    let selectedUrls = new Set();
+    try {
+      const sel = await fetch('/api/selected').then(r => r.json());
+      if (sel.exists) sel.articles.forEach(a => selectedUrls.add(a.source_url));
+    } catch {}
+
+    // Store articles globally so buttons can reference by index (avoids JSON-in-HTML issues)
+    window._scrapedArticles = s.articles;
+
+    const scrapedAt = formatBrussels(s.scraped_at, { hour: '2-digit', minute: '2-digit' });
+    el.innerHTML = `<ul class="source-list">
+      ${s.articles.map((a, i) => {
+        const alreadyAdded = selectedUrls.has(a.url);
+        return `<li class="source-item">
+          ${a.thumbnail_url
+            ? `<img class="source-thumb" src="${escapeHtml(a.thumbnail_url)}" loading="lazy" onerror="this.style.display='none'" />`
+            : `<div class="source-thumb-placeholder"></div>`}
+          <div class="source-body">
+            <div class="source-headline"><a href="${escapeHtml(a.url)}" target="_blank">${escapeHtml(a.headline)}</a></div>
+            <div class="source-meta">${escapeHtml(a.source)} — scraped at ${scrapedAt}</div>
+          </div>
+          <button class="btn-push" style="${alreadyAdded ? 'opacity:0.5;cursor:default' : ''}"
+            onclick="addToSelection(this, ${i})"
+            ${alreadyAdded ? 'disabled' : ''}>
+            ${alreadyAdded ? '✓ added' : '+ select'}
+          </button>
+        </li>`;
+      }).join('')}
+    </ul>`;
+  }
+
+  // ── Article selection ────────────────────────────────────────────────────────
+
+  async function loadSelected() {
+    const [s, cfg, ready] = await Promise.all([
+      fetch('/api/selected').then(r => r.json()),
+      fetch('/api/config').then(r => r.json()),
+      fetch('/api/ready').then(r => r.json()),
+    ]);
+    const el = document.getElementById('selected-content');
+    const addMoreBtn = document.getElementById('btn-add-more');
+    const generateAllWrap = document.getElementById('generate-all-wrap');
+    const total = s.exists ? s.articles.length : 0;
+    const remaining = cfg.pipeline.articlesPerDay - total;
+
+    if (addMoreBtn) {
+      addMoreBtn.textContent = remaining > 0 ? `+ Add ${remaining} more` : '+ Add more';
+      addMoreBtn.disabled = remaining <= 0;
+    }
+
+    if (!s.exists || total === 0) {
+      el.innerHTML = '<p class="empty">No selection yet — use "+ select" on articles above, or click "Refresh selection".</p>';
+      if (generateAllWrap) { generateAllWrap.style.display = 'none'; }
+      return;
+    }
+
+    // Build set of already-generated source_urls
+    const generatedUrls = new Set();
+    if (ready.exists && ready.articles) {
+      ready.articles.forEach(a => { if (a.source_urls) a.source_urls.forEach(u => generatedUrls.add(u)); });
+    }
+
+    const t = formatBrussels(s.selected_at, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+    // Store selected articles globally for generate buttons
+    window._selectedArticles = s.articles;
+
+    el.innerHTML = `
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Last updated ${t} — ${total}/${cfg.pipeline.articlesPerDay} articles</p>
+      <ul class="article-list">
+        ${s.articles.map((a, i) => {
+          const isManual = a.added_by === 'manual';
+          const isGenerated = generatedUrls.has(a.source_url);
+          return `<li class="article-item">
+            <span class="dot ${isManual ? 'dot-yellow' : 'dot-green'}"></span>
+            <span class="article-title" title="${escapeHtml(a.headline)}">${escapeHtml(a.headline)}</span>
+            <span class="article-cat">${escapeHtml(a.category)}</span>
+            <span class="badge ${isManual ? 'badge-yellow' : 'badge-green'}" style="flex-shrink:0">${isManual ? 'manual' : 'claude'}</span>
+            <button class="btn-generate" onclick="generateArticle(this, ${i})"
+              ${isGenerated ? 'disabled style="opacity:0.5;cursor:default"' : ''}>
+              ${isGenerated ? '✓ generated' : '✦ Generate'}
+            </button>
+          </li>`;
+        }).join('')}
+      </ul>`;
+
+    if (generateAllWrap) generateAllWrap.style.display = 'flex';
+  }
+
+  // ── Generate articles ─────────────────────────────────────────────────────────
+
+  async function generateArticle(btn, index) {
+    btn.disabled = true; btn.textContent = '…';
+    if (!window._selectedArticles || !window._selectedArticles[index]) {
+      alert('Selection not loaded — please refresh the page.');
+      btn.disabled = false; btn.textContent = '✦ Generate';
+      return;
+    }
+    const article = window._selectedArticles[index];
+    btn.textContent = '…writing';
+    try {
+      const res = await fetch('/api/generate-article', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source_url: article.source_url }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        btn.textContent = '⏳ generating';
+        // Poll until it appears in articles_ready.json (~60s for Claude + image)
+        let attempts = 0;
+        const poll = setInterval(async () => {
+          attempts++;
+          try {
+            const r = await fetch('/api/ready').then(r => r.json());
+            if (r.exists && r.articles) {
+              const found = r.articles.some(a => Array.isArray(a.source_urls) && a.source_urls.includes(article.source_url));
+              if (found) {
+                clearInterval(poll);
+                btn.textContent = '✓ generated';
+                btn.style.background = '#dcfce7';
+                btn.style.color = 'var(--green)';
+                btn.style.borderColor = '#bbf7d0';
+                await loadReady();
+              }
+            }
+          } catch {}
+          if (attempts >= 24) { // 2min timeout
+            clearInterval(poll);
+            btn.textContent = '✦ Generate';
+            btn.disabled = false;
+          }
+        }, 5000);
+      } else {
+        btn.textContent = '✦ Generate'; btn.disabled = false;
+        alert(data.error || 'Failed to start generation');
+      }
+    } catch (e) { btn.textContent = '✦ Generate'; btn.disabled = false; console.error('[generate]', e); }
+  }
+
+  async function generateAll(btn) {
+    btn.disabled = true; btn.textContent = '⏳ Generating all…';
+    const statusEl = document.getElementById('generate-all-status');
+    statusEl.className = 'inline-status'; statusEl.textContent = 'This may take several minutes…';
+    try {
+      const res = await fetch('/api/generate-all-articles', { method: 'POST' });
+      const data = await res.json();
+      if (data.ok) {
+        // Poll until all selected articles are generated
+        let attempts = 0;
+        const total = (window._selectedArticles || []).length;
+        const poll = setInterval(async () => {
+          attempts++;
+          try {
+            const r = await fetch('/api/ready').then(r => r.json());
+            const generated = r.exists ? (r.articles || []).length : 0;
+            statusEl.textContent = `${generated}/${total} generated…`;
+            if (generated >= total) {
+              clearInterval(poll);
+              btn.textContent = '✦ Generate all articles';
+              btn.disabled = false;
+              statusEl.className = 'inline-status ok'; statusEl.textContent = `✓ All ${generated} generated`;
+              setTimeout(() => { statusEl.textContent = ''; }, 4000);
+              await Promise.all([loadSelected(), loadReady()]);
+            }
+          } catch {}
+          if (attempts >= 60) { // 5min timeout
+            clearInterval(poll);
+            btn.textContent = '✦ Generate all articles'; btn.disabled = false;
+            statusEl.textContent = '';
+            await Promise.all([loadSelected(), loadReady()]);
+          }
+        }, 5000);
+      } else {
+        btn.textContent = '✦ Generate all articles'; btn.disabled = false;
+        statusEl.textContent = '';
+        alert(data.error || 'Failed to start generation');
+      }
+    } catch { btn.textContent = '✦ Generate all articles'; btn.disabled = false; statusEl.textContent = ''; }
+  }
+
+  // ── Articles ready to be posted ───────────────────────────────────────────────
+
+  async function loadReady() {
+    const s = await fetch('/api/ready').then(r => r.json());
+    const el = document.getElementById('ready-content');
+
+    window._readyArticles = s.exists ? s.articles : [];
+
+    if (!s.exists || !s.articles || s.articles.length === 0) {
+      el.innerHTML = '<p class="empty">No articles yet — generate articles from the selection above.</p>';
+      return;
+    }
+
+    const unposted = s.articles.filter(a => !a.posted && !a.failed);
+    const posted = s.articles.filter(a => a.posted).length;
+    const failed = s.articles.filter(a => a.failed).length;
+
+    el.innerHTML = `
+      <div class="ready-actions">
+        <button class="btn btn-primary" onclick="postAllNow(this)" ${unposted.length === 0 ? 'disabled' : ''}>↑ Post all now (${unposted.length})</button>
+        <button class="btn btn-ghost" onclick="postAllScheduled(this)" ${unposted.length === 0 ? 'disabled' : ''}>⏱ Post with intervals</button>
+        <span id="ready-action-status" class="inline-status"></span>
+        <span style="margin-left:auto;font-size:12px;color:var(--muted)">${posted} posted · ${failed} failed · ${unposted.length} pending</span>
+      </div>
+      <ul class="article-list">
+        ${s.articles.map(a => {
+          const isPosted = a.posted;
+          const isFailed = a.failed;
+          let dotClass = isPosted ? 'dot-green' : isFailed ? 'dot-red' : 'dot-yellow';
+          let badgeClass = isPosted ? 'badge-green' : isFailed ? 'badge-red' : 'badge-yellow';
+          let badgeText = isPosted ? 'posted' : isFailed ? 'failed' : 'pending';
+          const scheduledTime = formatBrussels(a.scheduled_for, { hour: '2-digit', minute: '2-digit' });
+          const postedTime = a.posted_at ? formatBrussels(a.posted_at, { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : null;
+          return `<li class="ready-article-item" style="cursor:pointer" onclick="showPreview('${escapeHtml(a.slug)}')">
+            <span class="dot ${dotClass}"></span>
+            <span class="ready-title" title="${escapeHtml(a.title)}">${escapeHtml(a.title)}</span>
+            <span class="article-cat">${escapeHtml(a.category)}</span>
+            <span class="ready-time">${postedTime ? `Posted ${postedTime}` : `Sched. ${scheduledTime}`}</span>
+            <button class="btn-push" onclick="event.stopPropagation();pushArticle(this, '${escapeHtml(a.slug)}')"
+              ${isPosted ? 'disabled style="opacity:0.5"' : ''}>
+              ${isPosted ? '✓ posted' : '↑ post now'}
+            </button>
+            <span class="badge ${badgeClass}">${badgeText}</span>
+          </li>`;
+        }).join('')}
+      </ul>`;
+  }
+
+  async function clearReady(btn) {
+    if (!confirm('Delete all articles ready to be posted? This cannot be undone.')) return;
+    btn.disabled = true;
+    await fetch('/api/clear-ready', { method: 'POST' });
+    await Promise.all([loadReady(), loadSelected(), loadStatus()]);
+    btn.disabled = false;
+  }
+
+  // ── Article preview modal ─────────────────────────────────────────────────────
+
+  function showPreview(slug) {
+    const article = (window._readyArticles || []).find(a => a.slug === slug);
+    if (!article) return;
+
+    document.getElementById('modal-title').textContent = article.title;
+    document.getElementById('modal-category').textContent = article.category;
+
+    const img = document.getElementById('modal-image');
+    if (article.featured_image_url) {
+      img.src = article.featured_image_url;
+      img.style.display = 'block';
+    } else {
+      img.style.display = 'none';
+    }
+
+    const credit = document.getElementById('modal-credit');
+    if (article.image_credit) {
+      credit.textContent = 'Photo : ' + article.image_credit;
+      credit.style.display = 'block';
+    } else {
+      credit.style.display = 'none';
+    }
+
+    document.getElementById('modal-chapo').textContent = article.chapo || '';
+    // Render body: convert markdown headers/bold/italic minimally
+    document.getElementById('modal-body').innerHTML = renderMarkdown(article.body || '');
+
+    const sourceWrap = document.getElementById('modal-source-wrap');
+    const sourceLink = document.getElementById('modal-source');
+    if (article.source_urls && article.source_urls[0]) {
+      sourceLink.href = article.source_urls[0];
+      sourceWrap.style.display = 'block';
+    } else {
+      sourceWrap.style.display = 'none';
+    }
+
+    document.getElementById('preview-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('preview-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function renderMarkdown(md) {
+    return escapeHtml(md)
+      .replace(/^### (.+)$/gm, '<h3 style="font-size:14px;font-weight:700;margin:16px 0 6px">$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2 style="font-size:15px;font-weight:700;margin:18px 0 8px">$1</h2>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/\n\n/g, '</p><p style="margin:0 0 12px">')
+      .replace(/^/, '<p style="margin:0 0 12px">')
+      .replace(/$/, '</p>');
+  }
+
+  async function postAllNow(btn) {
+    if (!confirm('Post all unposted articles now?')) return;
+    btn.disabled = true; btn.textContent = '…posting';
+    const statusEl = document.getElementById('ready-action-status');
+    statusEl.className = 'inline-status'; statusEl.textContent = 'Posting…';
+    try {
+      const res = await fetch('/api/post-all-now', { method: 'POST' });
+      const data = await res.json();
+      if (data.ok) {
+        statusEl.className = 'inline-status ok'; statusEl.textContent = `✓ ${data.posted} posted`;
+        setTimeout(() => { statusEl.textContent = ''; }, 4000);
+        await Promise.all([loadReady(), loadStatus()]);
+      } else {
+        statusEl.className = 'inline-status err'; statusEl.textContent = data.error || 'Error';
+      }
+    } catch { statusEl.className = 'inline-status err'; statusEl.textContent = 'Error'; }
+    btn.disabled = false; btn.textContent = `↑ Post all now`;
+    await loadReady();
+  }
+
+  async function postAllScheduled(btn) {
+    const intervalEl = document.getElementById('intervalMinutes');
+    const mins = intervalEl ? intervalEl.value : '?';
+    if (!confirm(`Post articles with ${mins}-minute intervals between each?`)) return;
+    btn.disabled = true;
+    const statusEl = document.getElementById('ready-action-status');
+    statusEl.className = 'inline-status'; statusEl.textContent = `Posting with ${mins}min intervals…`;
+    try {
+      const res = await fetch('/api/post-all-scheduled', { method: 'POST' });
+      const data = await res.json();
+      if (data.ok) {
+        statusEl.className = 'inline-status ok';
+        statusEl.textContent = `✓ ${data.total} articles queued (${data.intervalMinutes}min intervals)`;
+        setTimeout(async () => { statusEl.textContent = ''; await loadReady(); }, 6000);
+      } else {
+        statusEl.className = 'inline-status err'; statusEl.textContent = data.error || 'Error';
+        btn.disabled = false;
+      }
+    } catch { statusEl.className = 'inline-status err'; statusEl.textContent = 'Error'; btn.disabled = false; }
+  }
+
+  async function addToSelection(btn, index) {
+    const article = window._scrapedArticles[index];
+    btn.disabled = true; btn.textContent = '…';
+    try {
+      const res = await fetch('/api/add-to-selection', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(article),
+      });
+      const data = await res.json();
+      if (data.ok) { btn.textContent = '✓ added'; btn.style.opacity = '0.5'; await loadSelected(); }
+      else { btn.disabled = false; btn.textContent = '+ select'; alert(data.error); }
+    } catch { btn.disabled = false; btn.textContent = '+ select'; }
+  }
+
+  async function clearSelection(btn) {
+    btn.disabled = true; btn.textContent = '…';
+    await fetch('/api/clear-selection', { method: 'POST' });
+    await Promise.all([loadSelected(), loadScraped()]);
+    btn.disabled = false; btn.textContent = '✕ Clear';
+  }
+
+  async function runSelection(btn, mode) {
+    const origText = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Running…';
+    const statusEl = document.getElementById('selection-status');
+    statusEl.className = 'inline-status'; statusEl.textContent = '~30s…';
+
+    if (mode === 'refresh') {
+      await fetch('/api/clear-selection', { method: 'POST' });
+    }
+    await fetch('/api/run-selection', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode }),
+    });
+
+    setTimeout(async () => {
+      btn.disabled = false; btn.textContent = origText;
+      statusEl.textContent = '';
+      await Promise.all([loadSelected(), loadScraped()]); // reload scraped to reset button states
+    }, 35000);
+  }
+
+  // ── Status / Today's articles ────────────────────────────────────────────────
+
+  async function loadStatus() {
+    const s = await fetch('/api/status').then(r => r.json());
+    const el = document.getElementById('status-content');
+
+    if (!s.exists) {
+      el.innerHTML = '<p class="empty">No articles yet — pipeline hasn\'t run today.</p>';
+      return;
+    }
+
+    const posted = s.articles.filter(a => a.posted).length;
+    const failed = s.articles.filter(a => a.failed).length;
+    const pending = s.articles.filter(a => !a.posted && !a.failed).length;
+    const genTime = formatBrussels(s.generated_at, { hour: '2-digit', minute: '2-digit' });
+
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="stats-row" style="margin-bottom:0">
+          <div class="stat"><div class="stat-value green">${posted}</div><div class="stat-label">Posted</div></div>
+          <div class="divider-h"></div>
+          <div class="stat"><div class="stat-value yellow">${pending}</div><div class="stat-label">Pending</div></div>
+          <div class="divider-h"></div>
+          <div class="stat"><div class="stat-value red">${failed}</div><div class="stat-label">Failed</div></div>
+          <div class="divider-h"></div>
+          <div class="stat"><div class="stat-value">${s.total}</div><div class="stat-label">Total</div></div>
+        </div>
+        <span style="font-size:12px;color:var(--muted)">Generated at ${genTime} Brussels</span>
+      </div>
+      <ul class="article-list">
+        ${s.articles.map(a => {
+          const { date, time } = toBrusselsDatetime(a.scheduled_for);
+          const isPosted = a.posted;
+          const isFailed = a.failed;
+          let dotClass = isPosted ? 'dot-green' : isFailed ? 'dot-red' : 'dot-yellow';
+          let badgeClass = isPosted ? 'badge-green' : isFailed ? 'badge-red' : 'badge-yellow';
+          let badgeText = isPosted ? 'posted' : isFailed ? 'failed' : 'pending';
+          return `<li class="article-item">
+            <span class="dot ${dotClass}"></span>
+            <span class="article-title" title="${escapeHtml(a.title)}">${escapeHtml(a.title)}</span>
+            <span class="article-cat">${escapeHtml(a.category)}</span>
+            <input type="time" value="${time}" data-slug="${escapeHtml(a.slug)}" data-date="${date}" ${isPosted ? 'disabled' : ''} />
+            <button class="btn-push" onclick="pushArticle(this, '${escapeHtml(a.slug)}')" ${isPosted ? 'disabled' : ''}>
+              ${isPosted ? '✓ posted' : '↑ push now'}
+            </button>
+            <span class="badge ${badgeClass}">${badgeText}</span>
+          </li>`;
+        }).join('')}
+      </ul>`;
+  }
+
+  async function saveSchedule() {
+    const inputs = document.querySelectorAll('#status-content input[type="time"]');
+    if (!inputs.length) return;
+    const updates = Array.from(inputs).map(input => ({
+      slug: input.dataset.slug,
+      scheduled_for: `${input.dataset.date}T${input.value}`,
+    }));
+    const el = document.getElementById('schedule-status');
+    try {
+      await fetch('/api/schedule', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates) });
+      el.className = 'inline-status ok'; el.textContent = '✓ Saved';
+      setTimeout(() => { el.textContent = ''; }, 2500);
+    } catch { el.className = 'inline-status err'; el.textContent = 'Error'; }
+  }
+
+  async function pushArticle(btn, slug) {
+    btn.disabled = true;
+    btn.textContent = '…';
+    try {
+      const res = await fetch('/api/post-article', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug }) });
+      const data = await res.json();
+      if (data.ok) {
+        btn.textContent = '✓ posted';
+        btn.style.background = '#dcfce7';
+        await loadStatus();
+      } else {
+        btn.textContent = '✗ error';
+        btn.style.color = 'var(--red)';
+        btn.disabled = false;
+        alert(data.error || 'Failed to post article');
+      }
+    } catch {
+      btn.textContent = '✗ error';
+      btn.disabled = false;
+    }
+  }
+
+  // ── Actions ───────────────────────────────────────────────────────────────────
+
+  async function scrapeNow(btn) {
+    btn.disabled = true; btn.textContent = 'Scraping…';
+    await fetch('/api/scrape-now', { method: 'POST' });
+    btn.textContent = '✓ Started';
+    setTimeout(async () => { btn.disabled = false; btn.textContent = '⟳ Scrape now'; await Promise.all([loadScraped(), loadScrapeHistory()]); }, 25000);
+  }
+
+  async function runPipeline(btn) {
+    btn.disabled = true; btn.textContent = 'Starting…';
+    await fetch('/api/run-pipeline', { method: 'POST' });
+    btn.textContent = '▶ Running…';
+    setTimeout(() => { btn.disabled = false; btn.textContent = '▶ Run pipeline'; loadStatus(); }, 300000);
+  }
+
+  async function postNow(btn) {
+    btn.disabled = true; btn.textContent = 'Posting…';
+    await fetch('/api/post-now', { method: 'POST' });
+    btn.textContent = '✓ Started';
+    setTimeout(async () => { btn.disabled = false; btn.textContent = '↑ Post due articles'; await loadStatus(); }, 5000);
+  }
+
+  // ── Logs ──────────────────────────────────────────────────────────────────────
+
+  async function loadLogs() {
+    const { logs } = await fetch('/api/logs').then(r => r.json());
+    const el = document.getElementById('log-box');
+    el.innerHTML = logs.split('\n').map(line => {
+      if (line.includes('ERROR')) return `<span class="log-error">${escapeHtml(line)}</span>`;
+      if (line.includes('✅')) return `<span class="log-ok">${escapeHtml(line)}</span>`;
+      return escapeHtml(line);
+    }).join('\n');
+    el.scrollTop = el.scrollHeight;
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────────
+
+  loadNextRun();
+  loadConfig();
+  loadScrapeHistory();
+  loadScraped();
+  loadSelected();
+  loadReady();
+  loadStatus();
+  loadLogs();
+
+  // Update countdown every minute, refresh logs every 30s
+  setInterval(() => {
+    if (nextRunIso) document.getElementById('next-run-countdown').textContent = formatCountdown(nextRunIso);
+  }, 60000);
+  setInterval(loadLogs, 30000);
+</script>
+</body>
+</html>
