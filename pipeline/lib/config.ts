@@ -54,7 +54,7 @@ export interface PipelineConfig {
   };
 }
 
-const CONFIG_FILE = path.join(__dirname, "..", "config.json");
+const CONFIG_FILE = path.join(process.cwd(), "config.json");
 
 // In-memory cache — updated by refreshConfigFromApi()
 let _cache: PipelineConfig | null = null;

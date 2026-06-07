@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 
-const LOGS_DIR = path.join(__dirname, "..", "logs");
+const LOGS_DIR = path.join(process.cwd(), "logs");
 
 fs.mkdirSync(LOGS_DIR, { recursive: true });
 

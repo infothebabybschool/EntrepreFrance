@@ -1,4 +1,4 @@
-import * as dotenv from "dotenv";
+﻿import * as dotenv from "dotenv";
 dotenv.config();
 import * as fs from "fs";
 import * as path from "path";
@@ -15,24 +15,24 @@ import { syncScrapeCache, syncSelectionCache, syncReadyCache, syncLog, syncAlert
 import { SelectedArticle, PostedArticle, ArticlesReadyFileOutput } from "./types";
 import axios from "axios";
 
-const ARTICLES_FILE = path.join(__dirname, "data", "articles_ready.json");
-const LOCK_FILE = path.join(__dirname, "data", "pipeline.lock");
-const LOCK_MAX_AGE_MS = 45 * 60 * 1000; // 45 min — if lock is older, treat as stale
+const ARTICLES_FILE = path.join(process.cwd(), "data", "articles_ready.json");
+const LOCK_FILE = path.join(process.cwd(), "data", "pipeline.lock");
+const LOCK_MAX_AGE_MS = 45 * 60 * 1000; // 45 min â€” if lock is older, treat as stale
 
 // Track last scheduled run key to prevent double-firing within the same minute
 let _lastRanKey: string | null = null;
 
-// ── Lock helpers ──────────────────────────────────────────────────────────────
+// â”€â”€ Lock helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function acquireLock(): boolean {
   fs.mkdirSync(path.dirname(LOCK_FILE), { recursive: true });
   if (fs.existsSync(LOCK_FILE)) {
     const age = Date.now() - fs.statSync(LOCK_FILE).mtimeMs;
     if (age < LOCK_MAX_AGE_MS) {
-      logScheduler("scheduler", `Pipeline already running (lock age: ${Math.round(age / 60000)}m) — skipping`);
+      logScheduler("scheduler", `Pipeline already running (lock age: ${Math.round(age / 60000)}m) â€” skipping`);
       return false;
     }
-    logScheduler("scheduler", `Stale lock file found (${Math.round(age / 60000)}m old) — removing and proceeding`);
+    logScheduler("scheduler", `Stale lock file found (${Math.round(age / 60000)}m old) â€” removing and proceeding`);
   }
   fs.writeFileSync(LOCK_FILE, new Date().toISOString(), "utf-8");
   return true;
@@ -42,17 +42,17 @@ function releaseLock(): void {
   try { if (fs.existsSync(LOCK_FILE)) fs.unlinkSync(LOCK_FILE); } catch {}
 }
 
-// ── Pipeline runner ───────────────────────────────────────────────────────────
+// â”€â”€ Pipeline runner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Run the pipeline inline (no child process) so it can't be orphaned when
 // Docker stops the container. Uses a lock file to prevent duplicate runs.
 async function runPipeline(): Promise<void> {
   if (!acquireLock()) return;
 
-  logScheduler("pipeline", "Starting daily pipeline run…");
+  logScheduler("pipeline", "Starting daily pipeline runâ€¦");
   try {
     await runPipelineFunc();
-    logScheduler("pipeline", "✅ Pipeline completed successfully");
+    logScheduler("pipeline", "âœ… Pipeline completed successfully");
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     logSchedulerError("pipeline", `Pipeline failed: ${msg}`);
@@ -62,7 +62,7 @@ async function runPipeline(): Promise<void> {
   }
 }
 
-// ── Command poller ────────────────────────────────────────────────────────────
+// â”€â”€ Command poller â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function markCommandDone(id: string, status: "done" | "failed"): Promise<void> {
   const websiteUrl = process.env.WEBSITE_URL;
@@ -103,7 +103,7 @@ async function checkCommands(): Promise<void> {
         // After generating articles, post any that are now due
         await checkAndPost();
       } else if (command === "clear_scrape") {
-        const scrapeFile = path.join(__dirname, "data", "scraped_articles.json");
+        const scrapeFile = path.join(process.cwd(), "data", "scraped_articles.json");
         if (fs.existsSync(scrapeFile)) fs.unlinkSync(scrapeFile);
         await syncScrapeCache(new Date().toISOString(), 0, [], []);
         await syncLog("commands", "clear_scrape: scraped_articles.json deleted");
@@ -113,11 +113,11 @@ async function checkCommands(): Promise<void> {
         await checkAndPost();
       } else if (command === "refresh_selection") {
         const selected = await selectArticles();
-        const selectedFile = path.join(__dirname, "data", "selected_articles.json");
+        const selectedFile = path.join(process.cwd(), "data", "selected_articles.json");
         fs.mkdirSync(path.dirname(selectedFile), { recursive: true });
         fs.writeFileSync(selectedFile, JSON.stringify({ selected_at: new Date().toISOString(), total: selected.length, articles: selected }, null, 2));
       } else if (command === "add_to_selection") {
-        const selectedFile = path.join(__dirname, "data", "selected_articles.json");
+        const selectedFile = path.join(process.cwd(), "data", "selected_articles.json");
         let existing: { selected_at: string; total: number; articles: SelectedArticle[] } = { selected_at: new Date().toISOString(), total: 0, articles: [] };
         if (fs.existsSync(selectedFile)) {
           try { existing = JSON.parse(fs.readFileSync(selectedFile, "utf-8")); } catch {}
@@ -127,7 +127,7 @@ async function checkCommands(): Promise<void> {
           existing.articles.push({
             source_urls: [payload.source_url as string],
             headlines: [(payload.headline as string) || ""],
-            angle: "À couvrir selon la ligne éditoriale de BEpaper.",
+            angle: "Ã€ couvrir selon la ligne Ã©ditoriale de BEpaper.",
             category: "politique" as const,
             image_keywords: ["news", "belgium", "press"] as [string, string, string],
           });
@@ -138,14 +138,14 @@ async function checkCommands(): Promise<void> {
           await syncSelectionCache(existing.selected_at, existing.total, existing.articles);
         }
       } else if (command === "clear_selection") {
-        const selectedFile = path.join(__dirname, "data", "selected_articles.json");
+        const selectedFile = path.join(process.cwd(), "data", "selected_articles.json");
         if (fs.existsSync(selectedFile)) fs.unlinkSync(selectedFile);
         await syncSelectionCache(new Date().toISOString(), 0, []);
       } else if (command === "generate_article") {
         // Generate a single article by source_url and merge into articles_ready.json
         const sourceUrl = payload.source_url as string;
         if (!sourceUrl) throw new Error("Missing source_url in payload");
-        const selectedFile = path.join(__dirname, "data", "selected_articles.json");
+        const selectedFile = path.join(process.cwd(), "data", "selected_articles.json");
         let article: SelectedArticle | undefined;
         if (fs.existsSync(selectedFile)) {
           try {
@@ -159,11 +159,11 @@ async function checkCommands(): Promise<void> {
           article = {
             source_urls: [sourceUrl],
             headlines: [payload.headline as string],
-            angle: (payload.angle as string) || "À couvrir selon la ligne éditoriale de BEpaper.",
+            angle: (payload.angle as string) || "Ã€ couvrir selon la ligne Ã©ditoriale de BEpaper.",
             category: ((payload.category as string) || "politique") as SelectedArticle["category"],
             image_keywords: (payload.image_keywords as [string, string, string]) || ["news", "belgium", "press"],
           };
-          await syncLog("commands", `generate_article: article not in local file — using payload data for "${article.headlines[0].slice(0, 60)}"`);
+          await syncLog("commands", `generate_article: article not in local file â€” using payload data for "${article.headlines[0].slice(0, 60)}"`);
         }
         await syncLog("commands", `generate_article: writing "${article.headlines[0].slice(0, 60)}"`);
         const written = await writeArticles([article]);
@@ -176,7 +176,7 @@ async function checkCommands(): Promise<void> {
             a.scheduled_for = new Date(reviewDeadline).toISOString();
           }
         }
-        const readyFile = path.join(__dirname, "data", "articles_ready.json");
+        const readyFile = path.join(process.cwd(), "data", "articles_ready.json");
         fs.mkdirSync(path.dirname(readyFile), { recursive: true });
         // Merge with existing ready articles (replace if already exists, otherwise append)
         let existing: ArticlesReadyFileOutput = { generated_at: new Date().toISOString(), total: 0, articles: [] };
@@ -192,22 +192,22 @@ async function checkCommands(): Promise<void> {
         existing.generated_at = new Date().toISOString();
         fs.writeFileSync(readyFile, JSON.stringify(existing, null, 2));
         await syncReadyCache(existing.generated_at, existing.total, existing.articles);
-        await syncLog("commands", `generate_article done — "${article.headlines[0].slice(0, 60)}"`);
+        await syncLog("commands", `generate_article done â€” "${article.headlines[0].slice(0, 60)}"`);
       } else if (command === "generate_all") {
-        const selectedFile = path.join(__dirname, "data", "selected_articles.json");
+        const selectedFile = path.join(process.cwd(), "data", "selected_articles.json");
         if (!fs.existsSync(selectedFile)) throw new Error("No selected articles");
         const sel = JSON.parse(fs.readFileSync(selectedFile, "utf-8"));
         const written = await writeArticles(sel.articles);
         const ready = await enrichWithImages(written);
         const generatedAt = new Date().toISOString();
         const output = { generated_at: generatedAt, total: ready.length, articles: ready };
-        const readyFile = path.join(__dirname, "data", "articles_ready.json");
+        const readyFile = path.join(process.cwd(), "data", "articles_ready.json");
         fs.mkdirSync(path.dirname(readyFile), { recursive: true });
         fs.writeFileSync(readyFile, JSON.stringify(output, null, 2));
         await syncReadyCache(generatedAt, ready.length, ready);
-        await syncLog("commands", `generate_all done — ${ready.length} articles ready`);
+        await syncLog("commands", `generate_all done â€” ${ready.length} articles ready`);
       } else if (command === "clear_ready") {
-        const readyFile = path.join(__dirname, "data", "articles_ready.json");
+        const readyFile = path.join(process.cwd(), "data", "articles_ready.json");
         if (fs.existsSync(readyFile)) fs.unlinkSync(readyFile);
         await syncReadyCache(new Date().toISOString(), 0, []);
       } else if (command === "post_article") {
@@ -215,7 +215,7 @@ async function checkCommands(): Promise<void> {
         if (!slug) throw new Error("Missing slug in payload");
         await checkAndPostBySlug(slug);
         // Re-sync ready cache after posting
-        const readyFile = path.join(__dirname, "data", "articles_ready.json");
+        const readyFile = path.join(process.cwd(), "data", "articles_ready.json");
         if (fs.existsSync(readyFile)) {
           const data: ArticlesReadyFileOutput = JSON.parse(fs.readFileSync(readyFile, "utf-8"));
           await syncReadyCache(data.generated_at, data.total, data.articles as PostedArticle[]);
@@ -223,7 +223,7 @@ async function checkCommands(): Promise<void> {
       } else if (command === "mark_posted") {
         const slug = payload.slug as string;
         if (!slug) throw new Error("Missing slug in payload");
-        const readyFile = path.join(__dirname, "data", "articles_ready.json");
+        const readyFile = path.join(process.cwd(), "data", "articles_ready.json");
         if (fs.existsSync(readyFile)) {
           const data: ArticlesReadyFileOutput = JSON.parse(fs.readFileSync(readyFile, "utf-8"));
           const article = data.articles.find((a) => a.slug === slug);
@@ -237,7 +237,7 @@ async function checkCommands(): Promise<void> {
       } else if (command === "update_schedule") {
         const { slug, scheduled_for } = payload as { slug: string; scheduled_for: string };
         if (!slug || !scheduled_for) throw new Error("Missing slug or scheduled_for");
-        const readyFile = path.join(__dirname, "data", "articles_ready.json");
+        const readyFile = path.join(process.cwd(), "data", "articles_ready.json");
         if (fs.existsSync(readyFile)) {
           const data: ArticlesReadyFileOutput = JSON.parse(fs.readFileSync(readyFile, "utf-8"));
           const article = data.articles.find((a) => a.slug === slug);
@@ -254,7 +254,7 @@ async function checkCommands(): Promise<void> {
           tags?: string[]; featured_image_url?: string; image_credit?: string;
         };
         if (!slug) throw new Error("Missing slug");
-        const readyFile = path.join(__dirname, "data", "articles_ready.json");
+        const readyFile = path.join(process.cwd(), "data", "articles_ready.json");
         if (fs.existsSync(readyFile)) {
           const data: ArticlesReadyFileOutput = JSON.parse(fs.readFileSync(readyFile, "utf-8"));
           const article = data.articles.find((a) => a.slug === slug);
@@ -271,7 +271,7 @@ async function checkCommands(): Promise<void> {
         }
       } else if (command === "reschedule_articles") {
         // Re-space all unposted articles starting from now, using configured interval
-        const readyFile = path.join(__dirname, "data", "articles_ready.json");
+        const readyFile = path.join(process.cwd(), "data", "articles_ready.json");
         if (!fs.existsSync(readyFile)) throw new Error("No articles_ready.json found");
         const cfg = getConfig();
         const interval = cfg.posting.intervalMinutes ?? 130;
@@ -287,16 +287,16 @@ async function checkCommands(): Promise<void> {
         await syncLog("commands", `reschedule_articles: ${unposted.length} articles rescheduled (${interval}min intervals)`);
       }
       await markCommandDone(id, "done");
-      logScheduler("commands", `✅ Command done: ${command}`);
+      logScheduler("commands", `âœ… Command done: ${command}`);
     } catch (err) {
       logSchedulerError("commands", `Command failed (${command}): ${err instanceof Error ? err.message : String(err)}`);
-      await syncLog("commands", `Command failed: ${command} — ${err instanceof Error ? err.message : String(err)}`, true);
+      await syncLog("commands", `Command failed: ${command} â€” ${err instanceof Error ? err.message : String(err)}`, true);
       await markCommandDone(id, "failed");
     }
   }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function getTzParts(date: Date, timezone: string) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -319,17 +319,17 @@ function pipelineRanToday(timezone: string): boolean {
   } catch { return false; }
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
+// â”€â”€ Main â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async function main(): Promise<void> {
   // Fetch latest config from Supabase before doing anything else
   await refreshConfigFromApi();
 
   const config = getConfig();
-  logScheduler("scheduler", "═══════════════════════════════════════");
-  logScheduler("scheduler", `Scheduler started — timezone: ${config.schedule.timezone}`);
+  logScheduler("scheduler", "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
+  logScheduler("scheduler", `Scheduler started â€” timezone: ${config.schedule.timezone}`);
   logScheduler("scheduler", `Pipeline trigger: ${config.schedule.time} ${config.schedule.timezone}`);
-  logScheduler("scheduler", "═══════════════════════════════════════");
+  logScheduler("scheduler", "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•");
 
   // Poll commands every 10 seconds so admin actions execute quickly
   setInterval(() => {
@@ -337,7 +337,7 @@ async function main(): Promise<void> {
   }, 10000);
   logScheduler("scheduler", "Command poller registered: every 10 seconds");
 
-  // Cron job 1: every minute — refresh config from Supabase, check trigger time.
+  // Cron job 1: every minute â€” refresh config from Supabase, check trigger time.
   cron.schedule("* * * * *", () => {
     // Fire-and-forget async work inside the cron tick
     (async () => {
@@ -352,7 +352,7 @@ async function main(): Promise<void> {
 
       if (h === targetH && m === targetM && _lastRanKey !== runKey) {
         _lastRanKey = runKey;
-        logScheduler("scheduler", `⏰ Trigger time reached (${cfg.schedule.time} ${cfg.schedule.timezone})`);
+        logScheduler("scheduler", `â° Trigger time reached (${cfg.schedule.time} ${cfg.schedule.timezone})`);
         runPipeline().catch((err) => logSchedulerError("pipeline", String(err)));
       }
     } catch (err) {
@@ -374,7 +374,7 @@ async function main(): Promise<void> {
   logScheduler("scheduler", "Cron job 2 registered: article poster every 5 minutes");
 
   // Initial poster check on startup
-  logScheduler("scheduler", "Running initial article check…");
+  logScheduler("scheduler", "Running initial article checkâ€¦");
   try {
     await checkAndPost();
   } catch (err) {
@@ -386,3 +386,4 @@ main().catch((err) => {
   logSchedulerError("scheduler", `Fatal startup error: ${err instanceof Error ? err.message : String(err)}`);
   process.exit(1);
 });
+

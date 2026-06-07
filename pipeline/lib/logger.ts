@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 
-const LOGS_DIR = path.join(__dirname, "..", "logs");
+const LOGS_DIR = path.join(process.cwd(), "logs");
 const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 const LOG_FILE = path.join(LOGS_DIR, `pipeline_${today}.log`);
 
