@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "tsc",
+    "start": "node dist/scheduler.js",
     "scrape": "ts-node scrape.ts",
     "pipeline": "ts-node run.ts",
     "pipeline-now": "ts-node run.ts",
