@@ -135,25 +135,11 @@ See `.env.local.example` and `pipeline/.env.example` for full lists.
 
 ---
 
-## Pending customizations — apply on first run
+## First-run checklist
 
-These were configured in the generator and must be applied to the codebase before deploying:
+### 1. Verify config consistency
+Confirm that `src/lib/brand.ts`, `src/lib/utils.ts`, `src/lib/site-config.ts`, and `pipeline/config.json` all match the values in this file.
 
-### 1. Primary color
-In `tailwind.config.ts`, set:
-```ts
-accent: { DEFAULT: "#1d4ed8", hover: "#1942b8" }
-```
-
-### 2. HTML language and direction
-In `src/app/layout.tsx`, find the `<html>` opening tag and set:
-```tsx
-<html lang="fr">
-```
-
-
-### 3. Verify config consistency
-Confirm that `src/lib/brand.ts`, `src/lib/utils.ts`, and `pipeline/config.json` all match the values above.
 
 ---
 
