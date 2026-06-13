@@ -37,7 +37,7 @@ It was generated from the **BEpaper template** using the newspaper generator. Th
 | Setting | Value |
 |---|---|
 | Site name | EntrepreFrance |
-| Domain | entreprefrance2026.vercel.app |
+| Domain | entreprefrance.vercel.app |
 | Article language | fr / fr-FR |
 | Articles per day | 3 |
 | Pipeline trigger | 07:26 Europe/Brussels |
@@ -117,7 +117,7 @@ Add/edit journalists at `/admin/journalists`. Photo generation uses DALL-E via `
 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `RESEND_API_KEY`, `ARTICLES_API_SECRET`
 
 ### Pipeline (Render)
-`ANTHROPIC_API_KEY`, `PEXELS_API_KEY`, `ARTICLES_API_SECRET`, `WEBSITE_URL=https://entreprefrance2026.vercel.app`
+`ANTHROPIC_API_KEY`, `PEXELS_API_KEY`, `ARTICLES_API_SECRET`, `WEBSITE_URL=https://entreprefrance.vercel.app`
 
 See `.env.local.example` and `pipeline/.env.example` for full lists.
 

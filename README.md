@@ -33,11 +33,11 @@ Generated 2026-06-13
 - [ ] Confirm ARTICLES_API_SECRET is identical in both
 
 ## Step 6 — Deploy
-- [ ] Push master → Vercel auto-deploys → verify https://entreprefrance2026.vercel.app
+- [ ] Push master → Vercel auto-deploys → verify https://entreprefrance.vercel.app
 - [ ] Render auto-deploys → check pipeline service logs
 
 ## Step 7 — First run
-- [ ] Visit https://entreprefrance2026.vercel.app/admin/pipeline
+- [ ] Visit https://entreprefrance.vercel.app/admin/pipeline
 - [ ] Verify trigger time: 07:26 Europe/Brussels
 - [ ] Test each RSS feed
 - [ ] Click "Run full pipeline" → watch logs
@@ -48,7 +48,7 @@ Generated 2026-06-13
 
 ## Step 9 — Verify
 - [ ] First article appears on homepage with image, byline, category
-- [ ] Article URL: https://entreprefrance2026.vercel.app/article/[slug]
+- [ ] Article URL: https://entreprefrance.vercel.app/article/[slug]
 
 ## Warnings
 - [ ] Custom categories: update src/app/categorie/[slug]/page.tsx and all generateStaticParams calls

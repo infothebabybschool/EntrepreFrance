@@ -18,7 +18,7 @@ export default function ContactPage() {
             <h1 className="font-serif text-3xl font-bold text-navy">Contact</h1>
           </div>
           <p className="text-gray-500 text-sm font-sans ml-4 pl-3">
-            Suggestion, correction, partenariat — nous lisons chaque message.
+            Suggestion éditoriale, correction, opportunité de partenariat — la rédaction d&apos;EntrepreFrance est à votre écoute.
           </p>
         </div>
       </div>

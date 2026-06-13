@@ -1,6 +1,6 @@
 export const SITE_NAME = "EntrepreFrance";
 export const TAGLINE = "Entreprendre en France";
-export const SITE_DOMAIN = "entreprefrance2026.vercel.app";
+export const SITE_DOMAIN = "entreprefrance.vercel.app";
 export const LOGO_URL = "/brand/logo-full.png";
 export const FAVICON_URL = "/brand/favicon.ico";
 export const ARTICLE_LANGUAGE = "fr";

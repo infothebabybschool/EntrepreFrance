@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Cormorant_Garamond, Jost } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { PostHogProvider } from "@/components/PostHogProvider";
-import { SITE_NAME, TAGLINE } from "@/lib/brand";
+import { SITE_NAME, TAGLINE, ARTICLE_LANGUAGE, IS_RTL, FAVICON_URL } from "@/lib/brand";
 import "./globals.css";
 
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-playfair",
+const serifFont = Cormorant_Garamond({
+  subsets: ["latin","latin-ext"],
+  variable: "--font-serif",
   display: "swap",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+const sansFont = Jost({
+  subsets: ["latin","latin-ext"],
+  variable: "--font-sans",
   display: "swap",
 });
 
@@ -25,6 +25,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description: `${SITE_NAME} — ${TAGLINE}`,
+  ...(FAVICON_URL ? { icons: { icon: FAVICON_URL } } : {}),
 };
 
 export default function RootLayout({
@@ -32,15 +33,28 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+
   return (
     <ClerkProvider>
-      <html lang="fr">
-        <body className={`${playfair.variable} ${inter.variable} font-sans bg-gray-50 antialiased`}>
-          <PostHogProvider>
-            <Header />
-            <main className="min-h-screen">{children}</main>
-            <Footer />
-          </PostHogProvider>
+      <html lang={ARTICLE_LANGUAGE} dir={IS_RTL ? "rtl" : "ltr"}>
+        <head>
+          <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.classList.add('dark')}catch(e){}` }} />
+        </head>
+        <body className={`${serifFont.variable} ${sansFont.variable} font-sans bg-gray-50 antialiased`}>
+          {posthogKey ? (
+            <PostHogProvider>
+              <Header />
+              <main className="min-h-screen">{children}</main>
+              <Footer />
+            </PostHogProvider>
+          ) : (
+            <>
+              <Header />
+              <main className="min-h-screen">{children}</main>
+              <Footer />
+            </>
+          )}
         </body>
       </html>
     </ClerkProvider>

@@ -171,7 +171,7 @@ export default async function HomePage() {
             <div className="bg-navy text-white p-4">
               <p className="font-serif text-lg font-bold mb-2">À propos de {SITE_NAME}</p>
               <p className="text-sm text-blue-200 leading-relaxed">
-                {SITE_NAME} — {TAGLINE}
+                EntrepreFrance décrypte l&apos;actualité économique et entrepreneuriale française pour les bâtisseurs qui font bouger les lignes. Analyses, tendances et portraits de ceux qui entreprennent en France.
               </p>
               <Link href="/contact"
                 className="inline-block mt-3 text-xs font-sans text-blue-300 hover:text-white

@@ -15,7 +15,8 @@ export default function NewsletterPage() {
           La newsletter {SITE_NAME}
         </h1>
         <p className="text-gray-600 leading-relaxed">
-          Recevez les meilleurs articles de {SITE_NAME} directement dans votre boîte mail.
+          Chaque matin, les décideurs, fondateurs et investisseurs qui font la France de demain lisent EntrepreFrance.
+          Rejoignez-les — une sélection d&apos;articles percutants, sans bruit, directement dans votre boîte mail.
           Gratuit, sans publicité, désabonnement en un clic.
         </p>
       </div>

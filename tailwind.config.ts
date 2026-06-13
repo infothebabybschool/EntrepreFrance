@@ -11,18 +11,18 @@ const config: Config = {
     extend: {
       colors: {
         navy: {
-          DEFAULT: "#0f1f3d",
-          dark: "#0a1628",
-          light: "#1a3160",
+          DEFAULT: "#f82061",
+          dark: "#ba1849",
+          light: "#f94d81",
         },
         accent: {
-          DEFAULT: "#1d4ed8",
-          hover: "#1942b8",
+          DEFAULT: "#1E61FF",
+          hover: "#1a52d9",
         },
       },
       fontFamily: {
-        serif: ["var(--font-playfair)", "Georgia", "serif"],
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
     },
   },

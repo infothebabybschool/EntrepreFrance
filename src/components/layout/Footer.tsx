@@ -22,7 +22,7 @@ export default function Footer() {
               {SITE_NAME}
             </Link>
             <p className="text-sm mt-3 leading-relaxed text-blue-300">
-              {TAGLINE}
+              L&apos;actualité économique et entrepreneuriale française — pour ceux qui bâtissent, investissent et innovent.
             </p>
             <p className="text-xs text-blue-400 mt-4">
               Indépendant · Sans publicité · Gratuit
