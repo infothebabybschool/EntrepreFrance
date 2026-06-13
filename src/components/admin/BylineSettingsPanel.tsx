@@ -9,11 +9,13 @@ export interface BylineSettings {
   clickable: boolean;
 }
 
+import { SHOW_BYLINE, SHOW_JOURNALIST_PHOTO, LINK_JOURNALIST_PROFILE } from "@/lib/site-config";
+
 export const BYLINE_DEFAULTS: BylineSettings = {
-  show: true,
-  showPhoto: true,
+  show: SHOW_BYLINE,
+  showPhoto: SHOW_JOURNALIST_PHOTO,
   position: "below-chapo",
-  clickable: true,
+  clickable: LINK_JOURNALIST_PROFILE,
 };
 
 const POSITIONS: { value: BylineSettings["position"]; label: string }[] = [

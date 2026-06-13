@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CATEGORIES, CATEGORY_TO_SLUG, capitalizeCategory } from "@/lib/utils";
 import { SITE_NAME, TAGLINE } from "@/lib/brand";
+import { NEWSLETTER_ENABLED } from "@/lib/site-config";
 
 const LIENS = [
   { label: "À propos", href: "/contact" },
@@ -22,7 +23,7 @@ export default function Footer() {
               {SITE_NAME}
             </Link>
             <p className="text-sm mt-3 leading-relaxed text-blue-300">
-              L&apos;actualité économique et entrepreneuriale française — pour ceux qui bâtissent, investissent et innovent.
+              L&apos;actualité économique, entrepreneuriale et financière pour les professionnels français.
             </p>
             <p className="text-xs text-blue-400 mt-4">
               Indépendant · Sans publicité · Gratuit
@@ -65,21 +66,23 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest text-white mb-4">
-              Newsletter
-            </h3>
-            <p className="text-sm text-blue-300 leading-relaxed mb-4">
-              Recevez l&apos;essentiel de nos actualités chaque matin.
-            </p>
-            <Link
-              href="/newsletter"
-              className="inline-block bg-accent hover:bg-accent-hover text-white text-sm
-                         font-medium px-5 py-2.5 rounded transition-colors"
-            >
-              S&apos;abonner gratuitement
-            </Link>
-          </div>
+          {NEWSLETTER_ENABLED && (
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-widest text-white mb-4">
+                Newsletter
+              </h3>
+              <p className="text-sm text-blue-300 leading-relaxed mb-4">
+                Recevez l&apos;essentiel de nos actualités chaque matin.
+              </p>
+              <Link
+                href="/newsletter"
+                className="inline-block bg-accent hover:bg-accent-hover text-white text-sm
+                           font-medium px-5 py-2.5 rounded transition-colors"
+              >
+                S&apos;abonner gratuitement
+              </Link>
+            </div>
+          )}
 
         </div>
       </div>

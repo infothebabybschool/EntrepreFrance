@@ -29,6 +29,9 @@ export const SEARCH_ENABLED = true;
 export const DARK_MODE_ENABLED = true;
 export const COMMENTS_ENABLED = false;
 
+// --- Breaking news ---
+export const BREAKING_NEWS_TEXT = "";
+
 // --- Byline ---
 export const SHOW_BYLINE = true;
 export const LINK_JOURNALIST_PROFILE = true;

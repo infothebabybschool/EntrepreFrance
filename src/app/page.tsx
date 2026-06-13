@@ -6,7 +6,17 @@ import HeroSection from "@/components/home/HeroSection";
 import NewsletterBanner from "@/components/home/NewsletterBanner";
 import FilterableArticles from "@/components/home/FilterableArticles";
 import ArticleCard from "@/components/articles/ArticleCard";
+import BreakingNewsBanner from "@/components/home/BreakingNewsBanner";
+import FeaturedJournalist from "@/components/home/FeaturedJournalist";
 import { SITE_NAME, TAGLINE } from "@/lib/brand";
+import {
+  HERO_ARTICLE_COUNT,
+  GRID_COLS_CLASS,
+  NEWSLETTER_BANNER_ON_HOMEPAGE,
+  TRENDING_SECTION,
+  BREAKING_NEWS_BANNER,
+  FEATURED_JOURNALIST,
+} from "@/lib/site-config";
 
 export const revalidate = 60;
 
@@ -77,13 +87,16 @@ export default async function HomePage() {
   }
 
   const hero = articles[0];
-  const secondary = articles.slice(1, 3);
-  const gridArticles = articles.slice(3);
+  const secondary = articles.slice(1, HERO_ARTICLE_COUNT);
+  const gridArticles = articles.slice(HERO_ARTICLE_COUNT);
 
   const today = formatDate(new Date().toISOString());
 
   return (
     <div className="bg-gray-50">
+      {/* Breaking news banner */}
+      {BREAKING_NEWS_BANNER && <BreakingNewsBanner />}
+
       {/* Date strip */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
@@ -108,7 +121,7 @@ export default async function HomePage() {
       )}
 
       {/* Newsletter banner */}
-      <NewsletterBanner />
+      {NEWSLETTER_BANNER_ON_HOMEPAGE && <NewsletterBanner />}
 
       {/* Main content + sidebar */}
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -124,7 +137,7 @@ export default async function HomePage() {
           <aside className="lg:col-span-1 space-y-8">
 
             {/* Most read */}
-            {mostRead.length > 0 && (
+            {TRENDING_SECTION && mostRead.length > 0 && (
               <div className="bg-white border border-gray-200 p-4">
                 <SectionHeader title="Les plus consultés" small />
                 <ol className="space-y-3 mt-3">
@@ -167,11 +180,14 @@ export default async function HomePage() {
               </ul>
             </div>
 
+            {/* Featured journalist */}
+            {FEATURED_JOURNALIST && <FeaturedJournalist />}
+
             {/* About widget */}
             <div className="bg-navy text-white p-4">
               <p className="font-serif text-lg font-bold mb-2">À propos de {SITE_NAME}</p>
               <p className="text-sm text-blue-200 leading-relaxed">
-                EntrepreFrance décrypte l&apos;actualité économique et entrepreneuriale française pour les bâtisseurs qui font bouger les lignes. Analyses, tendances et portraits de ceux qui entreprennent en France.
+                EntrepreFrance décrypte chaque jour l&apos;actualité économique, entrepreneuriale et financière qui façonne la France de demain. Pensé pour les entrepreneurs, dirigeants et investisseurs qui veulent garder une longueur d&apos;avance.
               </p>
               <Link href="/contact"
                 className="inline-block mt-3 text-xs font-sans text-blue-300 hover:text-white
@@ -206,7 +222,7 @@ export default async function HomePage() {
                     Voir tout →
                   </Link>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className={GRID_COLS_CLASS}>
                   {catArticles.map((a) => (
                     <ArticleCard key={a.id} article={a} />
                   ))}

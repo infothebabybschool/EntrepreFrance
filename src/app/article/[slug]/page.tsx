@@ -6,8 +6,22 @@ import { createServerClient } from "@/lib/supabase/server";
 import MarkdownRenderer from "@/components/articles/MarkdownRenderer";
 import ReadingTracker from "@/components/articles/ReadingTracker";
 import ShareButton from "@/components/ui/ShareButton";
+import PrintButton from "@/components/ui/PrintButton";
+import BookmarkButton from "@/components/ui/BookmarkButton";
+import TextSizeControl from "@/components/ui/TextSizeControl";
+import RelatedArticles from "@/components/articles/RelatedArticles";
+import CommentsSection from "@/components/articles/CommentsSection";
 import { formatDate, capitalizeCategory, CATEGORY_TO_SLUG } from "@/lib/utils";
 import { SITE_NAME } from "@/lib/brand";
+import {
+  SHARE_BUTTON_ENABLED,
+  READING_HISTORY_ENABLED,
+  PRINT_ENABLED,
+  BOOKMARKS_ENABLED,
+  TEXT_SIZE_ENABLED,
+  RELATED_ARTICLES_ENABLED,
+  COMMENTS_ENABLED,
+} from "@/lib/site-config";
 import { Article } from "@/types";
 import { BYLINE_DEFAULTS, type BylineSettings } from "@/components/admin/BylineSettingsPanel";
 
@@ -90,7 +104,7 @@ export default async function ArticlePage({ params }: Props) {
 
   return (
     <article className="max-w-3xl mx-auto px-4 py-8">
-      <ReadingTracker articleId={a.id} />
+      {READING_HISTORY_ENABLED && <ReadingTracker articleId={a.id} />}
 
       {/* Category badge */}
       <div className="mb-4">
@@ -126,11 +140,13 @@ export default async function ArticlePage({ params }: Props) {
 
       {/* Meta */}
       {a.published_at && (
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex flex-wrap items-center gap-4 mb-6">
           <p className="text-sm text-gray-400 font-sans">
             Publié le {formatDate(a.published_at)}
           </p>
-          <ShareButton url={`/article/${a.slug}`} title={a.title} />
+          {SHARE_BUTTON_ENABLED && <ShareButton url={`/article/${a.slug}`} title={a.title} />}
+          {PRINT_ENABLED && <PrintButton />}
+          {BOOKMARKS_ENABLED && <BookmarkButton slug={a.slug} />}
         </div>
       )}
 
@@ -160,13 +176,29 @@ export default async function ArticlePage({ params }: Props) {
 
       {/* Body */}
       {a.body && (
-        <div className="prose-custom text-base leading-relaxed">
-          <MarkdownRenderer content={a.body} />
-        </div>
+        TEXT_SIZE_ENABLED ? (
+          <TextSizeControl>
+            <div className="prose-custom leading-relaxed">
+              <MarkdownRenderer content={a.body} />
+            </div>
+          </TextSizeControl>
+        ) : (
+          <div className="prose-custom text-base leading-relaxed">
+            <MarkdownRenderer content={a.body} />
+          </div>
+        )
       )}
 
       {/* Byline — end of article */}
       {byline.position === "end-of-article" && bylineEl}
+
+      {/* Related articles */}
+      {RELATED_ARTICLES_ENABLED && (
+        <RelatedArticles category={a.category} excludeSlug={a.slug} />
+      )}
+
+      {/* Comments */}
+      {COMMENTS_ENABLED && <CommentsSection />}
     </article>
   );
 }
